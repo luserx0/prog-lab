@@ -1,61 +1,55 @@
 #include "stdio.h"
-#include "math.h"
+#include <math.h>
 
 #define pi 3.1415926535
+#define lim 1e-6
 
-double count_nth( long fact, double power ){
-   
-   return (power / fact);
-}
+#ifndef abs
+#define abs(x)  (x < 0) ? x*-1 : x 
+#endif
 
-double sine( double x ){
-   
-   double diff, result=0, power = x;
-   short flag_minus = 0;
-   long n=1, fact=1;
- 
-   do{   
-      if( n != 1 ){ //skip first iteration
-         fact = fact * (n-1) * n; 
-         power = power * x * x; 
-      }//step
-
-      diff = count_nth( fact, power ); //oros
-
-      if( flag_minus ){
-         
-         result -= diff;
-         flag_minus = 0;
-      }
-      else{
-         
-         result += diff;
-         flag_minus = 1;
-
-      }  
-      //printf("%ld %lf\n", fact, diff);  troubleshoot
-      
-      n+=2;
-   
-   }while( diff > 10e-8 );
-
-   return result;
-}
-
+double sine(double);
 
 int main(){
    
    double x;
    
-   printf("\nGive me the # of degrees to count its sine: \n");
+   do{
+      printf("\nGive me the # of degrees[0,360] to count its sine: ");
+      scanf("%lf", &x);
+   }while( x < 0 || x > 360); //assert everything is in place
    
-   scanf("%lf", &x);
-   
-   //assert everything is in place
    x = x * pi / 180; //transform to radians
 
-   printf("My sine: %.6lf\n", sine(x));
+   printf("My sine: %lf\n", sine(x));
    printf("C's sine function: %.6lf\n", sin(x) );
+   
    return 0;
-
 }
+
+double sine( double x ){
+   
+   double result=x, last, cond_help=x;
+   short sign=-1; 
+   long n; 
+   
+   n = 3;
+   
+   //tried to use fact and power vars but they got to big
+   do
+   {   
+      last = cond_help;
+      
+      cond_help = cond_help * x * x / ( n * (n-1) ); //cond_help = power / fact
+      
+      //printf("%lf\n", cond_help);
+      result += ( cond_help * sign );
+       
+      n+=2;
+      sign *= -1;
+   }
+   while( abs(cond_help - last) > lim );
+
+   return result;
+}
+

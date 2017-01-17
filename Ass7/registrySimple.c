@@ -67,8 +67,9 @@ void readInput( unsigned int size, char **AM, char **Name, short Semester[], dou
       token = strtok(NULL, delim);
       Semester[i] = atoi(token);
 
-//      printf("%s\n", AM[i]);   
+      printf("%s\n", AM[i]);   
       
+
       for (j = 0; j < 5; ++j)
       {
          token = strtok(NULL, delim);

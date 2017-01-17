@@ -7,15 +7,16 @@
 #define GRADESNUM 6
 
 void writeFile( unsigned int, char**, char**, short*, double**);
-void readInput( unsigned int, char**, char**, short*, double**);
+void readInput( unsigned int, char**, char**, short*, double**, FILE*);
 
-int main()
+int main( int argc, char **argv)
 {
    unsigned int N, i;
    short *Semester;
    char **Name, **AM;
    double **Grades; // 6 positions, last one is the Avrg
-   
+   FILE *fp;
+
    printf("Number of students: ");
    scanf("%d", &N);
    
@@ -39,23 +40,24 @@ int main()
    }
    //Prospa8isa na ta kanw function ^^ alla o gcc evgaze error gia uninitialized
    
-   readInput( N, AM, Name, Semester, Grades);
+
+   fp = freopen(argv[1], "r", stdin);
+   readInput( N, AM, Name, Semester, Grades, fp);
+   fclose(fp);
 
    writeFile( N, AM, Name, Semester, Grades);
 
    return 0;
 }
 
-void readInput( unsigned int size, char **AM, char **Name, short Semester[], double **Grades )
+void readInput( unsigned int size, char **AM, char **Name, short Semester[], double **Grades, FILE *fp )
 {
-   FILE *fp;
-   freopen("registryinput
-   unsigned int i, j;
-   double sum;
+   unsigned int i, j, maxPos = 0;
+   double sum, max = 0.0;
    for (i = 0; i < size; ++i)
    {
       char buf[100], delim[2], *token;
-      scanf("%s", buf);  
+      fscanf(fp,"%s", buf);  
      
       delim[0] = buf[6]; //first delimiter is at pos 6 of buf
       delim[1] = '\0';
@@ -69,7 +71,7 @@ void readInput( unsigned int size, char **AM, char **Name, short Semester[], dou
       token = strtok(NULL, delim);
       Semester[i] = atoi(token);
 
-//      printf("%s\n", AM[i]);   
+      printf("%s\n", AM[i]);   
       
       sum = 0.0;
       for (j = 0; j < 5; ++j)
@@ -77,19 +79,20 @@ void readInput( unsigned int size, char **AM, char **Name, short Semester[], dou
          token = strtok(NULL, delim);
          Grades[i][j] = atof( token ); //Suppose due to ambiguous def that grades are symbol separated
          sum += Grades[i][j];
-      }      
-      Grades[i][5] = sum / 5;
-      printf("Stud Name: %s\t AM: %s\t Semester: %d\t Grades: [%.1lf][%.1lf][%.1lf][%.1lf][%.1lf]\n", Name[i], AM[i], Semester[i], Grades[i][0], Grades[i][1], Grades[i][2], Grades[i][3], Grades[i][4]);
-        
+      }
+      if( sum > max )
+      {
+         max = sum;
+         maxPos = i;
+      }  
    }
+   printf("\nThe one with the biggest Average is:\nStud Name: %s\t AM: %s\t Semester: %d\t Grades: [%.1lf][%.1lf][%.1lf][%.1lf][%.1lf]\n", Name[maxPos], AM[maxPos], Semester[maxPos], Grades[maxPos][0], Grades[maxPos][1], Grades[maxPos][2], Grades[maxPos][3], Grades[maxPos][4]);
 
 }
 
 void writeFile( unsigned int size, char **AM, char **Name, short Semester[], double **Grades )
 {
-   FILE *fp;
    int i;
-   fp = freopen("registry.txt", "w+", stdout);
 
    for (i = 0; i < size; ++i)
    {
@@ -97,6 +100,5 @@ void writeFile( unsigned int size, char **AM, char **Name, short Semester[], dou
       printf("Stud Name: %s\t AM: %s\t Semester: %d\t Grades: [%.1lf][%.1lf][%.1lf][%.1lf][%.1lf]\n", Name[i], AM[i], Semester[i], Grades[i][0], Grades[i][1], Grades[i][2], Grades[i][3], Grades[i][4]);
    
    } 
-   fclose(fp);
 }
 
